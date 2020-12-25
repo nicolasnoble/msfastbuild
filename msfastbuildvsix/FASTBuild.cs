@@ -234,10 +234,11 @@ namespace msfastbuildvsix
 				FBProcess.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding(SystemEncoding);
 
 				System.Diagnostics.DataReceivedEventHandler OutputEventHandler = (Sender, Args) => {
+					System.Diagnostics.Process process = Sender as System.Diagnostics.Process;
 					if (Args.Data != null)
 						fbPackage.m_outputPane.OutputString(Args.Data + "\r");
-					if (FBProcess.HasExited)
-						fbPackage.m_outputPane.OutputString(String.Format("Process exited with code {0} \r", FBProcess.ExitCode));
+					if (process.HasExited)
+						fbPackage.m_outputPane.OutputString(String.Format("Process exited with code {0} \r", process.ExitCode));
 				};
 
 				FBProcess.OutputDataReceived += OutputEventHandler;
