@@ -17,6 +17,8 @@ namespace msfastbuildvsix
 		private string FBArgs = "-dist -ide -monitor";
 		private string FBPath = "fbuild.exe";
 		private bool FBUnity = false;
+		private bool FBParallel = true;
+		private bool FBBreakEarly = true;
 
 		[Category("msfastbuild")]
 		[DisplayName("FASTBuild arguments")]
@@ -43,6 +45,24 @@ namespace msfastbuildvsix
 		{
 			get { return FBUnity; }
 			set { FBUnity = value; }
+		}
+
+		[Category("msfastbuild")]
+		[DisplayName("Use parallel")]
+		[Description("Parallelize the project builds.")]
+		public bool OptionFBParallel
+		{
+			get { return FBParallel; }
+			set { FBParallel = value; }
+		}
+
+		[Category("msfastbuild")]
+		[DisplayName("Break Early")]
+		[Description("Whether or not to stop building projects on the first error.")]
+		public bool OptionFBBreakEarly
+		{
+			get { return FBBreakEarly; }
+			set { FBBreakEarly = value; }
 		}
 	}
 
@@ -101,6 +121,14 @@ namespace msfastbuildvsix
 			}
 		}
 
+		public bool OptionFBParallel
+        {
+			get
+			{
+				OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+				return page.OptionFBParallel;
+			}
+		}
 		#region Package Members
 
 		/// <summary>
@@ -120,5 +148,14 @@ namespace msfastbuildvsix
 		}
 
 		#endregion
+		public bool OptionFBBreakEarly
+		{
+			get
+			{
+				OptionPageGrid page = (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
+				return page.OptionFBBreakEarly;
+			}
+		}
+
 	}
 }

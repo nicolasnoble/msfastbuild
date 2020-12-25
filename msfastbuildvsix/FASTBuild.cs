@@ -212,9 +212,19 @@ namespace msfastbuildvsix
 				fbWorkingDirectory = Path.GetDirectoryName(sln.FileName);
 			}
 
-			if(fbPackage.OptionFBUnity)
+			if (fbPackage.OptionFBUnity)
 			{
-				fbCommandLine += " -u true";
+				fbCommandLine += " -u";
+			}
+
+			if (fbPackage.OptionFBParallel)
+			{
+				fbCommandLine += " -p";
+			}
+
+			if (fbPackage.OptionFBBreakEarly)
+			{
+				fbCommandLine += " -e";
 			}
 
 			string msfastbuildPath = Assembly.GetAssembly(typeof(msfastbuild.msfastbuild)).Location;

@@ -55,7 +55,7 @@ namespace msfastbuild
         HelpText = "Whether to combine files into a unity step. May substantially improve compilation time, but not all projects are suitable.")]
         public bool UseUnity { get; set; }
 
-        [Option('e', "breakearly", DefaultValue = true,
+        [Option('e', "breakearly", DefaultValue = false,
         HelpText = "Whether or not to stop building projects on the first error.")]
         public bool BreakEarly { get; set; }
 
