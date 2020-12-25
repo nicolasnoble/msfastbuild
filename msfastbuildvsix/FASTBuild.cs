@@ -227,6 +227,7 @@ namespace msfastbuildvsix
 				FBProcess.StartInfo.Arguments = fbCommandLine;
 				FBProcess.StartInfo.WorkingDirectory = fbWorkingDirectory;
 				FBProcess.StartInfo.RedirectStandardOutput = true;
+				FBProcess.StartInfo.RedirectStandardError = true;
 				FBProcess.StartInfo.UseShellExecute = false;
 				FBProcess.StartInfo.CreateNoWindow = true;
 				var SystemEncoding = System.Globalization.CultureInfo.GetCultureInfo(GetSystemDefaultLCID()).TextInfo.OEMCodePage;
@@ -235,9 +236,12 @@ namespace msfastbuildvsix
 				System.Diagnostics.DataReceivedEventHandler OutputEventHandler = (Sender, Args) => {
 					if (Args.Data != null)
 						fbPackage.m_outputPane.OutputString(Args.Data + "\r");
+					if (FBProcess.HasExited)
+						fbPackage.m_outputPane.OutputString(String.Format("Process exited with code {0} \r", FBProcess.ExitCode));
 				};
 
 				FBProcess.OutputDataReceived += OutputEventHandler;
+				FBProcess.ErrorDataReceived += OutputEventHandler;
 				FBProcess.Start();
 				FBProcess.BeginOutputReadLine();
 				//FBProcess.WaitForExit();
