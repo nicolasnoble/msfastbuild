@@ -22,14 +22,14 @@ namespace msfastbuildvsix
         /// Command ID.
         /// </summary>
         public const int CommandId = 0x0100;
-		public const int SlnCommandId = 0x0101;
-		public const int ContextCommandId = 0x0102;
-		public const int SlnContextCommandId = 0x0103;
+        public const int SlnCommandId = 0x0101;
+        public const int ContextCommandId = 0x0102;
+        public const int SlnContextCommandId = 0x0103;
 
-		/// <summary>
-		/// Command menu group (command set GUID).
-		/// </summary>
-		public static readonly Guid CommandSet = new Guid("7c132991-dea1-4719-8c67-c20b24b6775c");
+        /// <summary>
+        /// Command menu group (command set GUID).
+        /// </summary>
+        public static readonly Guid CommandSet = new Guid("7c132991-dea1-4719-8c67-c20b24b6775c");
 
         /// <summary>
         /// VS Package that provides this command, not null.
@@ -57,24 +57,24 @@ namespace msfastbuildvsix
                 var menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
                 commandService.AddCommand(menuItem);
 
-				menuCommandID = new CommandID(CommandSet, SlnCommandId);
-				menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
-				commandService.AddCommand(menuItem);
+                menuCommandID = new CommandID(CommandSet, SlnCommandId);
+                menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
+                commandService.AddCommand(menuItem);
 
-				menuCommandID = new CommandID(CommandSet, ContextCommandId);
-				menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
-				commandService.AddCommand(menuItem);
+                menuCommandID = new CommandID(CommandSet, ContextCommandId);
+                menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
+                commandService.AddCommand(menuItem);
 
-				menuCommandID = new CommandID(CommandSet, SlnContextCommandId);
-				menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
-				commandService.AddCommand(menuItem);
-			}
-		}
+                menuCommandID = new CommandID(CommandSet, SlnContextCommandId);
+                menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
+                commandService.AddCommand(menuItem);
+            }
+        }
 
-		/// <summary>
-		/// Gets the instance of the command.
-		/// </summary>
-		public static FASTBuild Instance
+        /// <summary>
+        /// Gets the instance of the command.
+        /// </summary>
+        public static FASTBuild Instance
         {
             get;
             private set;
@@ -100,156 +100,157 @@ namespace msfastbuildvsix
             Instance = new FASTBuild(package);
         }
 
-		[System.Runtime.InteropServices.DllImport("kernel32.dll")]
-		public static extern int GetSystemDefaultLCID();
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        public static extern int GetSystemDefaultLCID();
 
-		private bool IsFBuildFindable(string FBuildExePath)
-		{
-			string fbuild = "fbuild.exe";
+        private bool IsFBuildFindable(string FBuildExePath)
+        {
+            string fbuild = "fbuild.exe";
 
-			if (FBuildExePath != fbuild)
-			{
-				return File.Exists(FBuildExePath);
-			}
+            if (FBuildExePath != fbuild)
+            {
+                return File.Exists(FBuildExePath);
+            }
 
-			string PathVariable = Environment.GetEnvironmentVariable("PATH");
-			foreach (string SearchPath in PathVariable.Split(Path.PathSeparator))
-			{
-				try
-				{
-					string PotentialPath = Path.Combine(SearchPath, fbuild);
-					if (File.Exists(PotentialPath))
-					{
-						return true;
-					}
-				}
-				catch (ArgumentException)
-				{ }
-			}
-			return false;
-		}
+            string PathVariable = Environment.GetEnvironmentVariable("PATH");
+            foreach (string SearchPath in PathVariable.Split(Path.PathSeparator))
+            {
+                try
+                {
+                    string PotentialPath = Path.Combine(SearchPath, fbuild);
+                    if (File.Exists(PotentialPath))
+                    {
+                        return true;
+                    }
+                }
+                catch (ArgumentException)
+                { }
+            }
+            return false;
+        }
 
-		/// <summary>
-		/// This function is the callback used to execute the command when the menu item is clicked.
-		/// See the constructor to see how the menu item is associated with this function using
-		/// OleMenuCommandService service and MenuCommand class.
-		/// </summary>
-		/// <param name="sender">Event sender.</param>
-		/// <param name="e">Event args.</param>
-		private void MenuItemCallback(object sender, EventArgs e)
+        /// <summary>
+        /// This function is the callback used to execute the command when the menu item is clicked.
+        /// See the constructor to see how the menu item is associated with this function using
+        /// OleMenuCommandService service and MenuCommand class.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Event args.</param>
+        private void MenuItemCallback(object sender, EventArgs e)
         {
             FASTBuildPackage fbPackage = (FASTBuildPackage)this.package;
             if (null == fbPackage.m_dte.Solution)
                 return;
 
-			MenuCommand eventSender = sender as MenuCommand;
+            MenuCommand eventSender = sender as MenuCommand;
 
-			fbPackage.m_outputPane.Activate();
-			fbPackage.m_outputPane.Clear();
+            fbPackage.m_outputPane.Activate();
+            fbPackage.m_outputPane.Clear();
 
-			if (eventSender == null)
-			{
-				fbPackage.m_outputPane.OutputString("VSIX failed to cast sender to OleMenuCommand.\r");
-				return;
-			}
+            if (eventSender == null)
+            {
+                fbPackage.m_outputPane.OutputString("VSIX failed to cast sender to OleMenuCommand.\r");
+                return;
+            }
 
-			if (fbPackage.m_dte.Debugger.CurrentMode != dbgDebugMode.dbgDesignMode)
-			{
-				fbPackage.m_outputPane.OutputString("Build not launched due to active debugger.\r");
-				return;
-			}
+            if (fbPackage.m_dte.Debugger.CurrentMode != dbgDebugMode.dbgDesignMode)
+            {
+                fbPackage.m_outputPane.OutputString("Build not launched due to active debugger.\r");
+                return;
+            }
 
-			if(!IsFBuildFindable(fbPackage.OptionFBPath))
-			{
-				fbPackage.m_outputPane.OutputString(string.Format("Could not find fbuild at the provided path: {0}, please verify in the msfastbuild options.\r", fbPackage.OptionFBPath));
-				return;
-			}
+            if (!IsFBuildFindable(fbPackage.OptionFBPath))
+            {
+                fbPackage.m_outputPane.OutputString(string.Format("Could not find fbuild at the provided path: {0}, please verify in the msfastbuild options.\r", fbPackage.OptionFBPath));
+                return;
+            }
 
-			fbPackage.m_dte.ExecuteCommand("File.SaveAll");
+            fbPackage.m_dte.ExecuteCommand("File.SaveAll");
 
-			string fbCommandLine = "";
-			string fbWorkingDirectory = "";
+            string fbCommandLine = "";
+            string fbWorkingDirectory = "";
 
-			Solution sln = fbPackage.m_dte.Solution;
-			SolutionBuild sb = sln.SolutionBuild;
-			SolutionConfiguration2 sc = sb.ActiveConfiguration as SolutionConfiguration2;
-			VCProject proj = null;
+            Solution sln = fbPackage.m_dte.Solution;
+            SolutionBuild sb = sln.SolutionBuild;
+            SolutionConfiguration2 sc = sb.ActiveConfiguration as SolutionConfiguration2;
+            VCProject proj = null;
 
-			if (eventSender.CommandID.ID != SlnCommandId && eventSender.CommandID.ID != SlnContextCommandId)
-			{
-				if (fbPackage.m_dte.SelectedItems.Count > 0)
-				{
-					Project envProj = (fbPackage.m_dte.SelectedItems.Item(1).Project as EnvDTE.Project);
-					if (envProj != null)
-					{
-						proj = envProj.Object as VCProject;
-					}
-				}
+            if (eventSender.CommandID.ID != SlnCommandId && eventSender.CommandID.ID != SlnContextCommandId)
+            {
+                if (fbPackage.m_dte.SelectedItems.Count > 0)
+                {
+                    Project envProj = (fbPackage.m_dte.SelectedItems.Item(1).Project as EnvDTE.Project);
+                    if (envProj != null)
+                    {
+                        proj = envProj.Object as VCProject;
+                    }
+                }
 
-				if (proj == null)
-				{
-					string startupProject = "";
-					foreach (String item in (Array)sb.StartupProjects)
-					{
-						startupProject += item;
-					}
-					proj = sln.Item(startupProject).Object as VCProject;
-				}
+                if (proj == null)
+                {
+                    string startupProject = "";
+                    foreach (String item in (Array)sb.StartupProjects)
+                    {
+                        startupProject += item;
+                    }
+                    proj = sln.Item(startupProject).Object as VCProject;
+                }
 
-				if (proj == null)
-				{
-					fbPackage.m_outputPane.OutputString("No valid vcproj selected for building or set as the startup project.\r");
-					return;
-				}
+                if (proj == null)
+                {
+                    fbPackage.m_outputPane.OutputString("No valid vcproj selected for building or set as the startup project.\r");
+                    return;
+                }
 
-				fbPackage.m_outputPane.OutputString("Building " + Path.GetFileName(proj.ProjectFile) + " " + sc.Name + " " + sc.PlatformName + "\r");
-				fbCommandLine = string.Format("-p \"{0}\" -c {1} -f {2} -s \"{3}\" -a\"{4}\" -b \"{5}\"", Path.GetFileName(proj.ProjectFile), sc.Name, sc.PlatformName, sln.FileName, fbPackage.OptionFBArgs, fbPackage.OptionFBPath);
-				fbWorkingDirectory = Path.GetDirectoryName(proj.ProjectFile);
-			}
-			else
-			{
-				fbCommandLine = string.Format("-s \"{0}\" -c {1} -f {2} -a\"{3}\" -b \"{4}\"", sln.FileName, sc.Name, sc.PlatformName, fbPackage.OptionFBArgs, fbPackage.OptionFBPath);
-				fbWorkingDirectory = Path.GetDirectoryName(sln.FileName);
-			}
+                fbPackage.m_outputPane.OutputString("Building " + Path.GetFileName(proj.ProjectFile) + " " + sc.Name + " " + sc.PlatformName + "\r");
+                fbCommandLine = string.Format("-p \"{0}\" -c {1} -f {2} -s \"{3}\" -a\"{4}\" -b \"{5}\"", Path.GetFileName(proj.ProjectFile), sc.Name, sc.PlatformName, sln.FileName, fbPackage.OptionFBArgs, fbPackage.OptionFBPath);
+                fbWorkingDirectory = Path.GetDirectoryName(proj.ProjectFile);
+            }
+            else
+            {
+                fbCommandLine = string.Format("-s \"{0}\" -c {1} -f {2} -a\"{3}\" -b \"{4}\"", sln.FileName, sc.Name, sc.PlatformName, fbPackage.OptionFBArgs, fbPackage.OptionFBPath);
+                fbWorkingDirectory = Path.GetDirectoryName(sln.FileName);
+            }
 
-			if(fbPackage.OptionFBUnity)
-			{
-				fbCommandLine += " -u true";
-			}
+            if (fbPackage.OptionFBUnity)
+            {
+                fbCommandLine += " -u true";
+            }
 
-			string msfastbuildPath = Assembly.GetAssembly(typeof(msfastbuild.msfastbuild)).Location;
-			try
-			{
-				fbPackage.m_outputPane.OutputString("Launching msfastbuild with command line: " + fbCommandLine + "\r");
+            string msfastbuildPath = Assembly.GetAssembly(typeof(msfastbuild.msfastbuild)).Location;
+            try
+            {
+                fbPackage.m_outputPane.OutputString("Launching msfastbuild with command line: " + fbCommandLine + "\r");
 
-				System.Diagnostics.Process FBProcess = new System.Diagnostics.Process();
-				FBProcess.StartInfo.FileName = msfastbuildPath;
-				FBProcess.StartInfo.Arguments = fbCommandLine;
-				FBProcess.StartInfo.WorkingDirectory = fbWorkingDirectory;
-				FBProcess.StartInfo.RedirectStandardOutput = true;
-				FBProcess.StartInfo.RedirectStandardError = true;
-				FBProcess.StartInfo.UseShellExecute = false;
-				FBProcess.StartInfo.CreateNoWindow = true;
-				var SystemEncoding = System.Globalization.CultureInfo.GetCultureInfo(GetSystemDefaultLCID()).TextInfo.OEMCodePage;
-				FBProcess.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding(SystemEncoding);
+                System.Diagnostics.Process FBProcess = new System.Diagnostics.Process();
+                FBProcess.StartInfo.FileName = msfastbuildPath;
+                FBProcess.StartInfo.Arguments = fbCommandLine;
+                FBProcess.StartInfo.WorkingDirectory = fbWorkingDirectory;
+                FBProcess.StartInfo.RedirectStandardOutput = true;
+                FBProcess.StartInfo.RedirectStandardError = true;
+                FBProcess.StartInfo.UseShellExecute = false;
+                FBProcess.StartInfo.CreateNoWindow = true;
+                var SystemEncoding = System.Globalization.CultureInfo.GetCultureInfo(GetSystemDefaultLCID()).TextInfo.OEMCodePage;
+                FBProcess.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding(SystemEncoding);
 
-				System.Diagnostics.DataReceivedEventHandler OutputEventHandler = (Sender, Args) => {
-					if (Args.Data != null)
-						fbPackage.m_outputPane.OutputString(Args.Data + "\r");
-					if (FBProcess.HasExited)
-						fbPackage.m_outputPane.OutputString(String.Format("Process exited with code {0} \r", FBProcess.ExitCode));
-				};
+                System.Diagnostics.DataReceivedEventHandler OutputEventHandler = (Sender, Args) =>
+                {
+                    if (Args.Data != null)
+                        fbPackage.m_outputPane.OutputString(Args.Data + "\r");
+                    if (FBProcess.HasExited)
+                        fbPackage.m_outputPane.OutputString(String.Format("Process exited with code {0} \r", FBProcess.ExitCode));
+                };
 
-				FBProcess.OutputDataReceived += OutputEventHandler;
-				FBProcess.ErrorDataReceived += OutputEventHandler;
-				FBProcess.Start();
-				FBProcess.BeginOutputReadLine();
-				//FBProcess.WaitForExit();
-			}
-			catch (Exception ex)
-			{
-				fbPackage.m_outputPane.OutputString("VSIX exception launching msfastbuild. Could be a broken VSIX? Exception: " + ex.Message + "\r");
-			}
-		}
-	}
+                FBProcess.OutputDataReceived += OutputEventHandler;
+                FBProcess.ErrorDataReceived += OutputEventHandler;
+                FBProcess.Start();
+                FBProcess.BeginOutputReadLine();
+                //FBProcess.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                fbPackage.m_outputPane.OutputString("VSIX exception launching msfastbuild. Could be a broken VSIX? Exception: " + ex.Message + "\r");
+            }
+        }
+    }
 }
